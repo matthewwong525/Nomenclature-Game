@@ -1,0 +1,1086 @@
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+//Nomenclature Game
+//By: Matthew Wong
+//April 29th, 2016
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import java.awt.image.*;
+import javax.imageio.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class nomenclature implements ActionListener, KeyListener, MouseListener, MouseMotionListener{
+  //Elements
+  element[] metal = new element[38];
+  element[] nonmetal = new element[15];
+  element[] nobleg = new element[15];
+  element[] polyatom10 = new element[10];
+  element[] polyatom11 = new element[25];
+  element[] acids10 = new element[18];
+  element[] acids11 = new element[25];
+  
+  //List to determine which mode the player wants to play
+  List<Integer> type = new ArrayList<Integer>();
+  
+  
+  //Answer
+  String strAnswer;
+  String strIComp;
+  //Ionic compounds
+  int intRandE1; //Random first element(metal)
+  int intRandE2; //Random second element(non-metal)
+  int intRandE2V2; //Randoms for second nonmetal for covalent
+  //Covalent Compounds
+  int intRandC1; //Random first non-metal
+  int intRandC2; //Random second non-metal
+  int intRandCNum1; //Gives you random number for naming
+  int intRandCNum2; //Gives you another random number for naming
+  //Hydrates
+  int intRandH;
+  //Polyatomic
+  int intRandP10;
+  int intRandP11;
+  //Acids
+  int intRandA10;
+  int intRandA11;
+  //Random Stuff
+  int intRandComp; //Random composition(either name --> form or form --> name)
+  int intRandType; //Random type of question(0=ionic, 1=covalent, 3=hydrates)
+  int intScore = 0;
+  int intHScore = 0;
+  
+  //Properties
+  Timer thetimer;
+  JFrame theframe;
+  JGraphics thepanel;
+  JLabel lblQAns;
+  JTextField theanswer;
+  JButton startbutton;
+  JButton helpbutton;
+  JButton aboutbutton;
+  JButton backbutton;
+  JButton ptablebutton;
+  JButton beginbutton;
+  JRadioButton therb10;
+  JRadioButton therb11;
+  JCheckBox cbionic;
+  JCheckBox cbcovalent;
+  JCheckBox cbpolyatomic10;
+  JCheckBox cbhydrates;
+  JCheckBox cbpolyatomic11;
+  JCheckBox cbacids10;
+  JCheckBox cbacids11;
+  Font font1 = new Font("Arial", Font.BOLD,30);
+  Font font2 = new Font("Arial",Font.PLAIN,10);
+  Font font3 = new Font("Arial",Font.BOLD,20);
+  
+  JLabel lblScore;
+  
+  boolean buttonpress == true;
+  
+  JButton newbutton;
+  JRadioButton rbformula;
+  JRadioButton rbname;
+  
+  JLabel lblQuestion;
+  JTextField tfAnswer;
+  
+  //Filewriting/reading
+  PrintWriter fileout = null;
+  BufferedReader thefile = null;
+  
+  //Methods
+  
+  public void keyReleased(KeyEvent evt){
+  }
+  public void keyPressed(KeyEvent evt){
+    buttonpress = true;
+  }
+  public void keyTyped(KeyEvent evt){
+  }
+  
+  
+  public void mouseExited(MouseEvent e){
+  }
+  public void mouseEntered(MouseEvent e){
+  }
+  public void mouseReleased(MouseEvent e){
+  }
+  public void mousePressed(MouseEvent e){
+  }
+  public void mouseClicked(MouseEvent e){
+  }
+  public void mouseMoved(MouseEvent e){
+  }
+  public void mouseDragged(MouseEvent e){
+  }
+  
+  
+  public void actionPerformed(ActionEvent evt){
+    if(evt.getSource() == thetimer){
+      thepanel.repaint();
+      if(cbionic.isSelected() || cbcovalent.isSelected() || cbpolyatomic10.isSelected() || cbhydrates.isSelected() || cbpolyatomic11.isSelected() || cbacids10.isSelected() || cbacids11.isSelected()){
+        if(beginbutton.isEnabled() == false){
+          tfAnswer.setEnabled(true);
+        }
+      }else{
+        tfAnswer.setEnabled(false);
+        beginbutton.setEnabled(true);
+        lblQuestion.setText("!");
+      }
+    }
+    //**************************
+    //The menus' event sources
+    //**************************
+    if(evt.getSource() == startbutton){
+      System.out.println("You clicked the startbutton");
+      //removes everything from the screen in main menu
+      thepanel.remove(startbutton);
+      thepanel.remove(aboutbutton);
+      thepanel.remove(helpbutton);
+      thepanel.remove(newbutton);
+      thepanel.remove(therb10);
+      thepanel.remove(therb11);
+      
+      //Adds different objects for the game
+      thepanel.add(backbutton);
+      thepanel.add(lblQuestion);
+      thepanel.add(tfAnswer);
+      thepanel.add(ptablebutton);
+      thepanel.add(lblScore);
+      thepanel.add(lblQAns);
+      thepanel.add(therb10);
+      thepanel.add(therb11);
+      thepanel.add(cbionic);
+      thepanel.add(cbcovalent);
+      thepanel.add(cbpolyatomic10);
+      thepanel.add(cbhydrates);
+      thepanel.add(cbpolyatomic11);
+      thepanel.add(cbacids10);
+      thepanel.add(cbacids11);
+      thepanel.add(beginbutton);
+      thepanel.intMenuSelect = 3;
+    }
+    if(evt.getSource() == helpbutton){
+      //removes everything from the screen in main menu
+      thepanel.remove(startbutton);
+      thepanel.remove(aboutbutton);
+      thepanel.remove(helpbutton);
+      thepanel.remove(newbutton);
+      thepanel.remove(therb10);
+      thepanel.remove(therb11);
+      
+      //Adds the object for the help screen
+      thepanel.add(backbutton);
+      thepanel.intMenuSelect = 1;
+    }
+    if(evt.getSource() == aboutbutton){
+      //removes everything from the screen in main menu
+      thepanel.remove(startbutton);
+      thepanel.remove(aboutbutton);
+      thepanel.remove(helpbutton);
+      thepanel.remove(newbutton);
+      thepanel.remove(therb10);
+      thepanel.remove(therb11);
+      
+      //adds objects for about screen
+      thepanel.add(backbutton);
+      thepanel.intMenuSelect = 2;
+    }
+    if(evt.getSource() == backbutton){ //**make it so that it doesn't fuck with instruction label
+      //adds everything to the screen in main menu
+      intScore = 0;
+      thepanel.intPTableY = 700;
+      thepanel.blnPTable = false;
+      //lblScore.setText("Your Score: " + intScore);
+      //lblQAns.setText("!");
+      thepanel.add(startbutton);
+      thepanel.add(aboutbutton);
+      thepanel.add(helpbutton);
+      thepanel.add(newbutton);
+      
+      thepanel.remove(therb10);
+      thepanel.remove(therb11);
+      
+      //removes everything that is not in the main menu
+      thepanel.remove(backbutton);
+      thepanel.remove(rbformula);
+      thepanel.remove(rbname);
+      
+      thepanel.remove(lblQuestion);
+      thepanel.remove(tfAnswer);
+      thepanel.remove(ptablebutton);
+      thepanel.remove(beginbutton);
+      thepanel.remove(lblScore);
+      thepanel.remove(lblQAns);
+      
+      thepanel.remove(cbionic);
+      thepanel.remove(cbcovalent);
+      thepanel.remove(cbpolyatomic10);
+      thepanel.remove(cbhydrates);
+      thepanel.remove(cbpolyatomic11);
+      thepanel.remove(cbacids10);
+      thepanel.remove(cbacids11);
+//      lblInput.setText("!");
+//      lblInstruction.setText("Please select a metal(elements with a positive charge)");
+      thepanel.intMenuSelect = 0;
+    }
+    //**************************
+    //The im bad event sources
+    //**************************
+    if(evt.getSource() == newbutton){
+      //removes everything from the screen in main menu
+      thepanel.remove(startbutton);
+      thepanel.remove(aboutbutton);
+      thepanel.remove(helpbutton);
+      thepanel.remove(newbutton);
+      thepanel.remove(therb10);
+      thepanel.remove(therb11);
+      
+      //adds the thing needed for a tutorial
+      thepanel.intMenuSelect = 4;
+      thepanel.add(backbutton);
+      thepanel.add(rbformula);
+      thepanel.add(rbname);
+    }
+
+    if(evt.getSource() == rbformula){
+      rbname.setSelected(false);
+      rbformula.setSelected(true);
+      thepanel.blnAlgType = false;
+    }else if(evt.getSource() == rbname){
+      rbformula.setSelected(false);
+      rbname.setSelected(true);
+      thepanel.blnAlgType = true;
+    }
+    
+    //**************************
+    //The quizes' event sources
+    //**************************
+    if(evt.getSource() == therb10){
+      therb11.setSelected(false);
+      therb10.setSelected(true);
+      cbionic.setSelected(true);
+      cbcovalent.setSelected(true);
+      cbacids10.setSelected(true);
+      cbpolyatomic10.setSelected(true);
+      cbhydrates.setSelected(false);
+      cbpolyatomic11.setSelected(false);
+      cbacids11.setSelected(false);
+
+      type.clear();
+      type.add(0);
+      type.add(1);
+      type.add(3);
+      type.add(5);
+    }else if(evt.getSource() == therb11){
+      therb10.setSelected(false);
+      therb11.setSelected(true);
+      cbionic.setSelected(true);
+      cbcovalent.setSelected(true);
+      cbpolyatomic10.setSelected(true);
+      cbhydrates.setSelected(true);
+      cbpolyatomic11.setSelected(true);
+      cbacids11.setSelected(true);
+      cbacids10.setSelected(true);
+      type.clear();
+      type.add(0);
+      type.add(1);
+      type.add(2);
+      type.add(3);
+      type.add(4);
+      type.add(5);
+      type.add(6);
+    }
+    if(evt.getSource() == cbionic || evt.getSource() == cbcovalent || evt.getSource() == cbpolyatomic10 || evt.getSource() == cbhydrates || evt.getSource() == cbpolyatomic11 || evt.getSource() == cbacids10 || evt.getSource() == cbacids11){
+      therb10.setSelected(false);
+      therb11.setSelected(false);
+      if(cbionic.isSelected() == true && type.contains(0) == false){
+        type.add(0);
+      }else if(type.contains(0) && cbionic.isSelected() == false){
+        type.remove(type.indexOf(0));
+      }
+      if(cbcovalent.isSelected() == true && type.contains(1) == false){
+        type.add(1);
+      }else if(type.contains(1) && cbcovalent.isSelected() == false){
+        type.remove(type.indexOf(1));
+      }
+      if(cbhydrates.isSelected() == true && type.contains(2) == false){
+        type.add(2);
+      }else if(type.contains(2) && cbhydrates.isSelected() == false){
+        type.remove(type.indexOf(2));
+      }
+      if(cbpolyatomic10.isSelected() == true && type.contains(3) == false){
+        type.add(3);
+      }else if(type.contains(3) && cbpolyatomic10.isSelected() == false){
+        type.remove(type.indexOf(3));
+      }
+      if(cbpolyatomic11.isSelected() == true && type.contains(4) == false){
+        type.add(4);
+      }else if(type.contains(4) && cbpolyatomic11.isSelected() == false){
+        type.remove(type.indexOf(4));
+      }
+      if(cbacids10.isSelected() == true && type.contains(5) == false){
+        type.add(5);
+      }else if(type.contains(5) && cbacids10.isSelected() == false){
+        type.remove(type.indexOf(5));
+      }
+      if(cbacids11.isSelected() == true && type.contains(6) == false){
+        type.add(6);
+      }else if(type.contains(6) && cbacids11.isSelected() == false){
+        type.remove(type.indexOf(6));
+      }
+      System.out.println(type);
+    }
+    if(evt.getSource() == ptablebutton){
+      if(thepanel.blnPTable == true){
+        thepanel.blnPTable = false;
+        thepanel.add(cbionic);
+        thepanel.add(cbcovalent);
+        thepanel.add(cbpolyatomic10);
+        thepanel.add(cbhydrates);
+        thepanel.add(cbpolyatomic11);
+        thepanel.add(cbacids10);
+        thepanel.add(cbacids11);
+        thepanel.add(therb10);
+        thepanel.add(therb11);
+      }else{
+        thepanel.blnPTable = true;
+        thepanel.remove(cbionic);
+        thepanel.remove(cbcovalent);
+        thepanel.remove(cbpolyatomic10);
+        thepanel.remove(cbhydrates);
+        thepanel.remove(cbpolyatomic11);
+        thepanel.remove(cbacids10);
+        thepanel.remove(cbacids11);
+        thepanel.remove(therb10);
+        thepanel.remove(therb11);
+      }
+    }
+    if(cbionic.isSelected() || cbcovalent.isSelected() || cbpolyatomic10.isSelected() || cbhydrates.isSelected() || cbpolyatomic11.isSelected() || cbacids10.isSelected() || cbacids11.isSelected()){
+      if(evt.getSource() == beginbutton){
+        beginbutton.setEnabled(false);
+        //Also set the list in here and print out the first answer
+        intRandE1 = (int)(Math.random()*36) + 1;
+        intRandE2 = (int)(Math.random()*14);
+        intRandE2V2 = (int)(Math.random()*14);
+        intRandComp = (int)(Math.random()*2);
+        intRandC1 = (int)(Math.random()*10) + 1;
+        intRandC2 = (int)(Math.random()*10) + 1;
+        intRandH = (int)(Math.random()*10) + 1;
+        intRandA10 = (int)(Math.random()*18);
+        intRandA11 = (int)(Math.random()*25);
+          
+        intRandP10 = (int)(Math.random()*9);
+        intRandP11 = (int)(Math.random()*25);
+        intRandType = type.get((int)(Math.random()*type.size()));
+        
+        //prints next question
+        if(intRandComp == 0){ //name
+          if(intRandType == 0){
+            lblQuestion.setText(metal[intRandE1].strName + " " + nonmetal[intRandE2].strName2);
+          }
+          else if(intRandType == 1){
+            //covalent compound label setting
+            lblQuestion.setText(compound.covalent(nonmetal[intRandE2].strName, nonmetal[intRandE2V2].strName2,intRandC1,intRandC2));
+          }
+          else if(intRandType == 2){
+            lblQuestion.setText(compound.hydrate(metal[intRandE1].strName.toLowerCase(),nonmetal[intRandE2].strName2.toLowerCase(),intRandH));
+          }
+          else if(intRandType == 3){
+            lblQuestion.setText(metal[intRandE1].strName + " " + polyatom10[intRandP10].strName);
+          }
+          else if(intRandType == 4){
+            lblQuestion.setText(metal[intRandE1].strName + " " + polyatom11[intRandP11].strName);
+          }
+          else if(intRandType == 5){
+            lblQuestion.setText(acids10[intRandA10].strName);
+          }
+          else if(intRandType == 6){
+            lblQuestion.setText(acids11[intRandA11].strName);
+          }
+        }else if(intRandComp == 1){ //formula
+          if(intRandType == 0){
+            strIComp = compound.displayionic(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge);
+            lblQuestion.setText(strIComp);
+          }else if(intRandType == 1){
+            //covalent compound label setting
+            if(intRandC1 == 1 && intRandC2 == 1){
+              lblQuestion.setText(nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol);
+            }else if(intRandC2 == 1){
+              lblQuestion.setText("<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"</html>");
+            }else if(intRandC1 == 1){
+              lblQuestion.setText("<html>"+nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>");
+            }else{
+              lblQuestion.setText("<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>");
+            }
+          }else if(intRandType == 2){
+            lblQuestion.setText(compound.formulahydrate(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge,intRandH));
+          }else if(intRandType == 3){
+            lblQuestion.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom10[intRandP10].strSymbol,polyatom10[intRandP10].strName2,metal[intRandE1].intCharge,polyatom10[intRandP10].intCharge));
+          }else if(intRandType == 4){
+            lblQuestion.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom11[intRandP11].strSymbol,polyatom11[intRandP11].strName2,metal[intRandE1].intCharge,polyatom11[intRandP11].intCharge));
+          }else if(intRandType == 5){
+            lblQuestion.setText("<html>" +compound.subscript(acids10[intRandA10].strSymbol) + "</html>");
+          }else if(intRandType == 6){
+            lblQuestion.setText("<html>" +compound.subscript(acids11[intRandA11].strSymbol) + "</html>");
+          }
+        }
+      }
+    }
+    if(evt.getSource() == tfAnswer){
+      if(intRandComp == 0){ //Decides to give a question to convert from name --> formula and outputs answer
+        if(intRandType == 0){ //If it randoms to an ionic compound
+          strAnswer = compound.ionic(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge);
+          if(strAnswer.equals(tfAnswer.getText())){ //If they are correct
+            System.out.println("You are correct! " + compound.displayionic(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge));
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(compound.displayionic(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge));
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong! "+ compound.displayionic(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge));
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(compound.displayionic(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge));
+            intScore--;
+          }
+        }else if(intRandType == 1){ //If it randoms to a covalent compound
+          //CHANGE SHIT RIGHT HERE
+          if(intRandC1 == 1 && intRandC2 == 1){
+            strAnswer = nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol;
+          }else if(intRandC2 == 1){
+            strAnswer = nonmetal[intRandE2].strSymbol+intRandC1+nonmetal[intRandE2V2].strSymbol;
+          }else if(intRandC1 == 1){
+            strAnswer = nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol+intRandC2;
+          }else{
+            strAnswer = nonmetal[intRandE2].strSymbol+intRandC1+nonmetal[intRandE2V2].strSymbol+intRandC2;
+          }
+          if(strAnswer.equals(tfAnswer.getText())){ //If they are correct
+            //covalent compound label setting
+            if(intRandC1 == 1 && intRandC2 == 1){
+              strAnswer = nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol;
+            }else if(intRandC2 == 1){
+              strAnswer = "<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"</html>";
+            }else if(intRandC1 == 1){
+              strAnswer = "<html>"+nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>";
+            }else{
+              strAnswer = "<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>";
+            }
+            
+            System.out.println("You are correct! " + strAnswer);
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            //covalent compound label setting
+            if(intRandC1 == 1 && intRandC2 == 1){
+              strAnswer = nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol;
+            }else if(intRandC2 == 1){
+              strAnswer = "<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"</html>";
+            }else if(intRandC1 == 1){
+              strAnswer = "<html>"+nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>";
+            }else{
+              strAnswer = "<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>";
+            }
+            System.out.println("You are wrong! "+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            intScore--;
+          }
+          
+        }else if(intRandType == 2){
+          //Put code here for hydrates
+          strAnswer = compound.answerforhydrates(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge,intRandH);
+          if(strAnswer.equals(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            if(intRandH == 1){
+              lblQAns.setText(compound.ansformulahydrate(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge,intRandH));
+            }else{
+              lblQAns.setText(compound.ansformulahydrate(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge,intRandH));
+            }
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            if(intRandH == 1){
+              lblQAns.setText(compound.ansformulahydrate(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge,intRandH));
+            }else{
+              lblQAns.setText(compound.ansformulahydrate(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge,intRandH));
+            }
+            intScore--;
+          }
+        }else if(intRandType == 3){ // code for polyatomic grade 10
+          strAnswer = compound.polyatomic(metal[intRandE1].strSymbol,polyatom10[intRandP10].strSymbol,polyatom10[intRandP10].strName2,metal[intRandE1].intCharge,polyatom10[intRandP10].intCharge);
+          if(strAnswer.equals(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom10[intRandP10].strSymbol,polyatom10[intRandP10].strName2,metal[intRandE1].intCharge,polyatom10[intRandP10].intCharge));
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom10[intRandP10].strSymbol,polyatom10[intRandP10].strName2,metal[intRandE1].intCharge,polyatom10[intRandP10].intCharge));
+            intScore--;
+          }
+        }else if(intRandType == 4){
+          strAnswer = compound.polyatomic(metal[intRandE1].strSymbol,polyatom11[intRandP11].strSymbol,polyatom11[intRandP11].strName2,metal[intRandE1].intCharge,polyatom11[intRandP11].intCharge);
+          if(strAnswer.equals(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom11[intRandP11].strSymbol,polyatom11[intRandP11].strName2,metal[intRandE1].intCharge,polyatom11[intRandP11].intCharge));
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom11[intRandP11].strSymbol,polyatom11[intRandP11].strName2,metal[intRandE1].intCharge,polyatom11[intRandP11].intCharge));
+            intScore--;
+          }
+        }else if(intRandType == 5){
+          strAnswer = acids10[intRandA10].strSymbol;
+          if(strAnswer.equals(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText("<html>" +compound.subscript(acids10[intRandA10].strSymbol)+ "</html>");
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText("<html>" +compound.subscript(acids10[intRandA10].strSymbol) + "</html>");
+            intScore--;
+          }
+        }else if(intRandType == 6){
+          strAnswer = acids11[intRandA11].strSymbol;
+          if(strAnswer.equals(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText("<html>" +compound.subscript(acids11[intRandA11].strSymbol)+ "</html>");
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText("<html>" +compound.subscript(acids11[intRandA11].strSymbol) + "</html>");
+            intScore--;
+          }
+        }
+      }else if(intRandComp == 1){ //Decides to give a question to convert from formula --> name and outputs answer
+        if(intRandType == 0){ //If it randoms to an ionic compound
+          strAnswer = metal[intRandE1].strName + " "+ nonmetal[intRandE2].strName2;
+          if(strAnswer.equalsIgnoreCase(tfAnswer.getText())){  //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{  //If they are wrong
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            System.out.println("You are wrong!"+ strAnswer);
+            intScore--;
+          }
+        }else if(intRandType == 1){ //If it randoms to a covalent compound
+          strAnswer = compound.covalent(nonmetal[intRandE2].strName, nonmetal[intRandE2V2].strName2,intRandC1,intRandC2);
+          if(strAnswer.equalsIgnoreCase(tfAnswer.getText())){ //If they are correct
+            System.out.println("You are correct!" + strAnswer);
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            intScore--;
+          }
+        }else if(intRandType == 2){
+          //Put code here for hydrates 
+          strAnswer = metal[intRandE1].strName.toLowerCase() + " "+ nonmetal[intRandE2].strName2.toLowerCase() + " " + compound.prefix(intRandH) + "hydrate";
+          if(strAnswer.equalsIgnoreCase(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            intScore--;
+          }
+        }else if(intRandType == 3){ //code for polyatomic grade 10
+          strAnswer = metal[intRandE1].strName + " " + polyatom10[intRandP10].strName;
+          if(strAnswer.equalsIgnoreCase(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            intScore--;
+          }
+        }else if(intRandType == 4){
+          strAnswer = metal[intRandE1].strName + " " + polyatom11[intRandP11].strName;
+          if(strAnswer.equalsIgnoreCase(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            intScore--;
+          }
+        }else if(intRandType == 5){
+          strAnswer = acids10[intRandA10].strName;
+          if(strAnswer.equalsIgnoreCase(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            intScore--;
+          }
+        }else if(intRandType == 6){
+          strAnswer = acids11[intRandA11].strName;
+          if(strAnswer.equalsIgnoreCase(tfAnswer.getText())){ //If they are correct
+            lblQAns.setForeground(Color.GREEN);
+            lblQAns.setText(strAnswer);
+            System.out.println("You are correct!" + strAnswer);
+            intScore++;
+          }else{ //If they are wrong
+            System.out.println("You are wrong!"+ strAnswer);
+            lblQAns.setForeground(Color.RED);
+            lblQAns.setText(strAnswer);
+            intScore--;
+          }
+        }
+      }
+      lblQAns.setText(lblQAns.getText() + " (Press any key to continue)");
+      //outputs your score and sends it to the highscore.txt to see if you beat the high score
+      lblScore.setText("Your Score: " + intScore);
+      buttonpress = false;
+      while(buttonpress == false){
+        
+      }
+      //Resets random variables for the question
+      
+      intRandE1 = (int)(Math.random()*36) + 1;
+      intRandE2 = (int)(Math.random()*14);
+      intRandE2V2 = (int)(Math.random()*14);
+      intRandComp = (int)(Math.random()*2);
+      intRandC1 = (int)(Math.random()*10) + 1;
+      intRandC2 = (int)(Math.random()*10) + 1;
+      intRandH = (int)(Math.random()*10) + 1;
+      intRandA10 = (int)(Math.random()*18);
+      intRandA11 = (int)(Math.random()*25);
+      intRandP10 = (int)(Math.random()*9);
+      intRandP11 = (int)(Math.random()*25);
+      intRandType = type.get((int)(Math.random()*type.size()));
+      
+      //prints next question
+      if(intRandComp == 0){ //name
+        if(intRandType == 0){
+          lblQuestion.setText(metal[intRandE1].strName + " " + nonmetal[intRandE2].strName2);
+        }
+        else if(intRandType == 1){
+          //covalent compound label setting
+          lblQuestion.setText(compound.covalent(nonmetal[intRandE2].strName, nonmetal[intRandE2V2].strName2,intRandC1,intRandC2));
+        }
+        else if(intRandType == 2){
+          lblQuestion.setText(compound.hydrate(metal[intRandE1].strName.toLowerCase(),nonmetal[intRandE2].strName2.toLowerCase(),intRandH));
+        }
+        else if(intRandType == 3){
+          lblQuestion.setText(metal[intRandE1].strName + " " + polyatom10[intRandP10].strName);
+        }
+        else if(intRandType == 4){
+          lblQuestion.setText(metal[intRandE1].strName + " " + polyatom11[intRandP11].strName);
+        }
+        else if(intRandType == 5){
+          lblQuestion.setText(acids10[intRandA10].strName);
+        }
+        else if(intRandType == 6){
+          lblQuestion.setText(acids11[intRandA11].strName);
+        }
+      }else if(intRandComp == 1){ //formula
+        if(intRandType == 0){
+          strIComp = compound.displayionic(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge);
+          lblQuestion.setText(strIComp);
+        }else if(intRandType == 1){
+          //covalent compound label setting
+          if(intRandC1 == 1 && intRandC2 == 1){
+            lblQuestion.setText(nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol);
+          }else if(intRandC2 == 1){
+            lblQuestion.setText("<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"</html>");
+          }else if(intRandC1 == 1){
+            lblQuestion.setText("<html>"+nonmetal[intRandE2].strSymbol+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>");
+          }else{
+            lblQuestion.setText("<html>"+nonmetal[intRandE2].strSymbol+"<sub>"+intRandC1+"</sub>"+nonmetal[intRandE2V2].strSymbol+"<sub>"+intRandC2+"</sub></html>");
+          }
+        }else if(intRandType == 2){
+          lblQuestion.setText(compound.formulahydrate(metal[intRandE1].strSymbol,nonmetal[intRandE2].strSymbol,metal[intRandE1].intCharge,nonmetal[intRandE2].intCharge,intRandH));
+        }else if(intRandType == 3){
+          lblQuestion.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom10[intRandP10].strSymbol,polyatom10[intRandP10].strName2,metal[intRandE1].intCharge,polyatom10[intRandP10].intCharge));
+        }else if(intRandType == 4){
+          lblQuestion.setText(compound.displaypolyatomic(metal[intRandE1].strSymbol,polyatom11[intRandP11].strSymbol,polyatom11[intRandP11].strName2,metal[intRandE1].intCharge,polyatom11[intRandP11].intCharge));
+        }else if(intRandType == 5){
+          lblQuestion.setText("<html>" +compound.subscript(acids10[intRandA10].strSymbol) + "</html>");
+        }else if(intRandType == 6){
+          lblQuestion.setText("<html>" +compound.subscript(acids11[intRandA11].strSymbol) + "</html>");
+        }
+      }
+      tfAnswer.setText("");
+    }
+  }
+  
+  
+  //Constructor
+  public nomenclature(){
+    
+    //If it is an ionic compound
+    intRandE1 = (int)(Math.random()*36) + 1;
+    intRandE2 = (int)(Math.random()*14);
+    intRandE2V2 = (int)(Math.random()*14);
+    intRandC1 = (int)(Math.random()*10) + 1;
+    intRandC2 = (int)(Math.random()*10) + 1;
+    intRandH = (int)(Math.random()*10) + 1;
+    intRandA10 = (int)(Math.random()*18);
+    intRandA11 = (int)(Math.random()*25);
+    intRandP10 = (int)(Math.random()*9);
+    intRandP11 = (int)(Math.random()*25);
+    intRandComp = (int)(Math.random()*2);
+    intRandType = (int)(Math.random()*6);
+    
+    //Elements(nonmetal)
+    metal[0] = new element("hydrogen","hydride","H",1);
+    metal[1] = new element("lithium","lithide","Li",1);
+    metal[2] = new element("berylium","berilide","Be",2);
+    metal[3] = new element("sodium","sodide","Na",1);
+    metal[4] = new element("magnesium","magneside","Mg",2);
+    metal[5] = new element("potassium","potasside","K",1);
+    metal[6] = new element("calcium","calcide","Ca",2);
+    metal[7] = new element("rubidium", "rubidide","Rb",1);
+    metal[8] = new element("strontium","strontide","Sr",2);
+    metal[9] = new element("caesium", "caeside", "Cs",1);
+    metal[10] = new element("barium", "baride", "Ba",2);
+    metal[11] = new element("francium","francide","Fr",1);
+    metal[12] = new element("radium" , "radide", "Ra",2);
+    metal[13] = new element("titanium(III)","","Ti",3);
+    metal[14] = new element("titanium(IV)","","Ti",4);
+    metal[15] = new element("chromium(II)","","Cr",2);
+    metal[16] = new element("chromium(III)","","Cr",3);
+    metal[17] = new element("iron(II)","","Fe",2);
+    metal[18] = new element("iron(III)","","Fe",3);
+    metal[19] = new element("cobalt(II)","","Co",2);
+    metal[20] = new element("cobalt(III)","","Co",3);
+    metal[21] = new element("nickel(II)","","Ni",2);
+    metal[22] = new element("nickel(III)","","Ni",3);
+    metal[23] = new element("copper(I)","","Cu",1);
+    metal[24] = new element("copper(II)","","Cu",2);
+    metal[25] = new element("zinc","","Zn",2);
+    metal[26] = new element("silver","","Ag",1);
+    metal[27] = new element("tin(II)","","Sn",2);
+    metal[28] = new element("tin(IV)","","Sn",4);
+    metal[29] = new element("platinum(II)","","Pt",2);
+    metal[30] = new element("platinum(IV)","","Pt",4);
+    metal[31] = new element("gold(I)","","Au",1);
+    metal[32] = new element("gold(III)","","Au",3);
+    metal[33] = new element("mercury(I)","","Hg",1);
+    metal[34] = new element("mercury(II)","","Hg",2);
+    metal[35] = new element("lead(II)","","Pb",2);
+    metal[36] = new element("lead(IV)","","Pb",4);
+    metal[37] = new element("ammonium","","NH4",1);
+    
+    //Elements(metal)
+    nonmetal[0] = new element("nitrogen","nitride","N",3);
+    nonmetal[1] = new element("oxygen","oxide","O",2);
+    nonmetal[2] = new element("fluorine","fluoride","F",1);
+    nonmetal[3] = new element("phosphorus","phosphide","P",3);
+    nonmetal[4] = new element("sulphur","sulphide","S",2);
+    nonmetal[5] = new element("chlorine","chloride","Cl",1);
+    nonmetal[6] = new element("carbon","carbide","C",4);
+    nonmetal[7] = new element("silicon","silicide","Si",4);
+    nonmetal[8] = new element("arsenic","arsenide","As",3);
+    nonmetal[9] = new element("selenium","selenide","Se",2);
+    nonmetal[10] = new element("bromine","bromide","Br",1);
+    nonmetal[11] =  new element("tellurium","telluride","Te",2);
+    nonmetal[12] =  new element("iodine","iodide","I",1);
+    nonmetal[13] = new element("astatine","astatide","At",1);
+    
+    //Elements(can be both)
+    //nonmetal[1] = new element("Carbon","Carbide","C",6,4);
+    
+    //Elements(noble gases) or hard elements
+    nobleg[0] = new element("helium","DNE","He",0);
+    nobleg[1] = new element("neon","DNE","Ne",0);
+    nobleg[2] = new element("argon","DNE","Ar",0);
+    nobleg[3] = new element("boron","Boride", "B",3);
+    
+    //Polatomic ions(Grade 10)
+    polyatom10[0] = new element("nitrate","","NO3",1);
+    polyatom10[1] = new element("hydrogen carbonate","","HCO3",1);
+    polyatom10[2] = new element("hydroxide","","OH",1);
+    polyatom10[3] = new element("chlorate","","ClO3",1);
+    polyatom10[4] = new element("bromate","","BrO3",1);
+    polyatom10[5] = new element("iodate","","IO3",1);
+    polyatom10[6] = new element("carbonate","","CO3",2);
+    polyatom10[7] = new element("sulphate","","SO4",2);
+    polyatom10[8] = new element("phosphate","","PO4",3);
+    polyatom10[9] = new element("ammonia","","NH3",1);
+    
+    //Polyatomic ions(Grade 11)
+    polyatom11[0] = new element("cyanide","","CN",1);
+    polyatom11[1] = new element("acetate","","C2H3O2",1);
+    polyatom11[2] = new element("hypochlorite","","ClO",1);
+    polyatom11[3] = new element("chlorite","","ClO2",1);
+    polyatom11[4] = new element("perchlorate","","ClO4",1);
+    polyatom11[5] = new element("hydrogen oxalate","","HC2O4",1);
+    polyatom11[6] = new element("hydrogen sulphite","","HSO3",1);
+    polyatom11[7] = new element("hydrogen sulphate","","HSO4",1);
+    polyatom11[8] = new element("dihydrogen phosphite ","","H2PO3",1);
+    polyatom11[9] = new element("dihydrogen phosphate","","H2PO4",1);
+    polyatom11[10] = new element("manganate","","MnO4",1);
+    polyatom11[11] = new element("nitrite","","NO2",1);
+    polyatom11[12] = new element("cyanate","","OCN",1);
+    polyatom11[13] = new element("thiocyanate","","SCN",1);
+    
+    polyatom11[14] = new element("oxalate","","C2O4",2);
+    polyatom11[15] = new element("chromate","","CrO4",2);
+    polyatom11[16] = new element("dichromate","","Cr2O7",2);
+    polyatom11[17] = new element("hydrogen phosphite","","HPO3",2);
+    polyatom11[18] = new element("hydrogen phosphate","","HPO4",2);
+    polyatom11[19] = new element("peroxide","","O2",2);
+    polyatom11[20] = new element("sulphite","","SO3",2);
+    polyatom11[21] = new element("thiosulphate","","S2O3",2);
+    
+    polyatom11[22] = new element("arsenite","","AsO3",3);
+    polyatom11[23] = new element("arsenate","","AsO4",3);
+    polyatom11[24] = new element("phosphite","","PO3",3);
+    
+    //Acids Grade 10
+    acids10[0] = new element("hydronitric acid","","H3N",0);
+    acids10[1] = new element("water","","H2O",0);
+    acids10[2] = new element("hydrofluoric acid","","HF",0);
+    acids10[3] = new element("hydrophosphoric acid","","H3P",0);
+    acids10[4] = new element("hydrosulphuric acid","","H2S",0);
+    acids10[5] = new element("hydrochloric acid","","HCl",0);
+    acids10[6] = new element("hydroarsenic acid","","H3As",0);
+    acids10[7] = new element("hydroselenic acid","","H2Se",0);
+    acids10[8] = new element("hydrobromic acid","","HBr",0);
+    acids10[9] = new element("hydroiodic acid","","HI",0);
+    acids10[10] = new element("nitric acid","","HNO3",0);
+    acids10[11] = new element("chloric acid","","HClO3",0);
+    acids10[12] = new element("bromic acid","","HBrO3",0);
+    acids10[13] = new element("acetic acid","","HC2H3O2",0);
+    acids10[14] = new element("iodic acid","","HIO3",0);
+    acids10[15] = new element("carbonic acid","","H2CO3",0);
+    acids10[16] = new element("phosphoric acid","","H3PO4",0);
+    acids10[17] = new element("sulphuric acid","","H2SO4",0);
+    
+    //Grade 11
+    acids11[0] = new element("bromous acid","","BrO2",0);
+    acids11[1] = new element("hypobromous acid","","BrO",0);
+    acids11[2] = new element("hypoiodous acid","","HIO",0);
+    acids11[3] = new element("iodous acid","","HIO2",0);
+    acids11[4] = new element("periodic acid","","HIO4",0);
+    acids11[5] = new element("hypocarbonous acid","","H2CO",0);
+    acids11[6] = new element("hyposulphurous acid","","H2SO2",0);
+    acids11[7] = new element("persulphuric acid","","H2SO5",0);
+    acids11[8] = new element("hydrocyanic acid","","HCN",0);
+    acids11[9] = new element("hypochlorous acid","","HClO",0);
+    acids11[10] = new element("chlorous acid","","HClO2",0);
+    acids11[11] = new element("perchloric acid","","HClO4",0);
+    acids11[12] = new element("manganic acid","","HMnO4",0);
+    acids11[13] = new element("nitrous acid","","HNO2",0);
+    acids11[14] = new element("hyponitrous acid","","HNO",0);
+    acids11[15] = new element("pernitric acid","","HNO4",0);
+    acids11[16] = new element("percarbonic acid","","H2CO4",0);
+    acids11[17] = new element("cyanic acid","","HCNO",0);
+    acids11[18] = new element("thiocyanic acid","","HSCN",0);
+    acids11[19] = new element("oxalic acid","","H2C2O4",0);
+    acids11[20] = new element("chromic acid","","H2Cr2O4",0);
+    acids11[21] = new element("dichromic acid","","H2Cr2O7",0);
+    acids11[22] = new element("sulphurous acid","","H2SO3",0);
+    acids11[23] = new element("arsenic acid","","H3AsO4",0);
+    acids11[24] = new element("phosphorous acid","","H3PO3",0);
+    
+    
+    theframe = new JFrame();
+    thepanel = new JGraphics();
+    
+    //The main menu
+    thepanel.setLayout(null);
+    thepanel.setPreferredSize(new Dimension(800,600));
+    thepanel.addMouseListener(this);
+    thepanel.addMouseMotionListener(this);
+    
+    theframe.setResizable(false);
+    theframe.setContentPane(thepanel);
+    theframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+    startbutton = new JButton("Begin!");
+    startbutton.setSize(200, 100);
+    startbutton.setLocation(300, 100);
+    startbutton.setFont(font1);
+    startbutton.addActionListener(this);
+    thepanel.add(startbutton);
+    
+    helpbutton = new JButton("Help");
+    helpbutton.setSize(200, 100);
+    helpbutton.setLocation(300, 200);
+    helpbutton.setFont(font1);
+    helpbutton.addActionListener(this);
+    thepanel.add(helpbutton);
+    
+    aboutbutton = new JButton("About");
+    aboutbutton.setSize(200, 100);
+    aboutbutton.setLocation(300, 300);
+    aboutbutton.setFont(font1);
+    aboutbutton.addActionListener(this);
+    thepanel.add(aboutbutton);
+    
+    newbutton = new JButton("I'm bad");
+    newbutton.setSize(200, 100);
+    newbutton.setLocation(300, 400);
+    newbutton.setFont(font1);
+    newbutton.addActionListener(this);
+    thepanel.add(newbutton);
+    
+    
+    //************************************
+    //The quiz
+    //************************************
+
+    lblQuestion = new JLabel("!");
+    lblQuestion.setSize(400, 50);
+    lblQuestion.setLocation(300, 10);
+    lblQuestion.setFont(font3);
+    
+    tfAnswer = new JTextField();
+    tfAnswer.setSize(200, 50);
+    tfAnswer.setLocation(300, 100);
+    tfAnswer.addActionListener(this);
+    tfAnswer.setEnabled(false);
+    
+    lblQAns = new JLabel("!");
+    lblQAns.setSize(470, 35);
+    lblQAns.setLocation(300, 50);
+    
+    
+    ptablebutton = new JButton("P-Table");
+    ptablebutton.setSize(100, 50);
+    ptablebutton.setLocation(700, 500);
+    ptablebutton.addActionListener(this);
+    
+    beginbutton = new JButton("Begin");
+    beginbutton.setSize(100,50);
+    beginbutton.setLocation(700, 450);
+    beginbutton.addActionListener(this);
+    
+    lblScore = new JLabel("Your Score: " + intScore);
+    lblScore.setSize(400, 35);
+    lblScore.setLocation(0, 0);
+    lblScore.setFont(font1);
+    
+    therb10 = new JRadioButton("Grade 10");
+    therb10.setSize(100, 50);
+    therb10.setLocation(250, 155);
+    therb10.addActionListener(this);
+    //thepanel.add(therb10);
+    
+    therb11 = new JRadioButton("Grade 11");
+    therb11.setSize(100, 50);
+    therb11.setLocation(450, 155);
+    therb11.addActionListener(this);
+    //thepanel.add(therb11);
+    
+    cbionic = new JCheckBox("Ionic");
+    cbionic.setSize(100,50);
+    cbionic.setLocation(250,200);
+    cbionic.addActionListener(this);
+    
+    
+    cbcovalent = new JCheckBox("Covalent");
+    cbcovalent.setSize(100,50);
+    cbcovalent.setLocation(250,250);
+    cbcovalent.addActionListener(this);
+    
+    cbacids10 = new JCheckBox("Acids (Gr.10)");
+    cbacids10.setSize(100,50);
+    cbacids10.setLocation(250,300);
+    cbacids10.addActionListener(this);
+    
+    cbpolyatomic10 = new JCheckBox("Polyatomic (Gr.10)");
+    cbpolyatomic10.setSize(150,50);
+    cbpolyatomic10.setLocation(250,350);
+    cbpolyatomic10.addActionListener(this);
+    
+    
+    cbhydrates = new JCheckBox("Hydrates");
+    cbhydrates.setSize(100,50);
+    cbhydrates.setLocation(450,200);
+    cbhydrates.addActionListener(this);
+    
+    
+    cbacids11 = new JCheckBox("Acids (Gr.11)");
+    cbacids11.setSize(100,50);
+    cbacids11.setLocation(450,250);
+    cbacids11.addActionListener(this);
+    
+    cbpolyatomic11 = new JCheckBox("Polyatomic (Gr.11)");
+    cbpolyatomic11.setSize(150,50);
+    cbpolyatomic11.setLocation(450,300);
+    cbpolyatomic11.addActionListener(this);
+    
+    
+    
+    //************************************
+    //***NON VISIBLE THINGS***
+    //************************************
+    backbutton = new JButton("Back");
+    backbutton.setSize(100, 50);
+    backbutton.setLocation(700, 550);
+    //backbutton.setFont(font1);
+    backbutton.addActionListener(this);
+    
+    //************************************
+    //The new button for people who are not very good(Not visible in main menu)
+    //************************************
+    rbformula = new JRadioButton("Formula > Name");
+    rbformula.setSelected(true);
+    rbformula.setSize(125, 50);
+    rbformula.setLocation(550, 500);
+    rbformula.addActionListener(this);
+    
+    rbname = new JRadioButton("Name > Formula");
+    rbname.setSize(125, 50);
+    rbname.setLocation(550, 550);
+    rbname.addActionListener(this);
+    
+    
+    
+    
+    //Timer
+    thetimer = new Timer(1000/60,this);
+    thetimer.start();
+    
+    //Sets the frame based on panel not frame itself
+    theframe.pack();
+    theframe.setVisible(true);
+  }
+  
+  //Main Method
+  public static void main(String[] args){
+    nomenclature start = new nomenclature();
+  }
+
+}
